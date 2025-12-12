@@ -20,17 +20,23 @@ and `docker_shell_scripts/`) that keeps ProtonMail credentials out of the
 Compose file. The flow is:
 
 1. Build the image: `docker compose build`.
-2. Run `./scripts/hydroxide-auth.sh` and enter your username, ProtonMail
-   password and current 2FA code when prompted. The script launches the container
-   in an auth-only mode (`HYDROXIDE_AUTH_ONLY=1`), runs `hydroxide auth` inside
-   it and stores the resulting bridge hash in the mounted data volume.
-3. Start the always-on bridge: `docker compose up -d hydroxide`.
+2. Start the long-running service: `docker compose up -d hydroxide`. If no
+   credentials are present yet, the container will idle until you authenticate.
+3. Authenticate once (can be repeated any time):
+   * CLI workflow: run `./hydroxide-auth.sh`. It uses `docker compose exec` to
+     run `/usr/local/bin/hydroxide-auth-cli` inside the already running container
+     and prompts for username/password/2FA there.
+   * Portainer/TrueNAS workflow: open a console/exec session for the container
+     (e.g. `docker compose exec -it hydroxide /bin/sh`) and run
+     `hydroxide-auth-cli`. The helper writes the resulting bridge hash to
+     `/data/info.json`.
 
 The hashed bridge credentials are persisted inside the host directories mounted
 to `/data` and `/root/.config/hydroxide`, so container restarts do not require
 re-entering anything. If you need to re-authenticate (e.g. you changed your
-ProtonMail password), just rerun `./scripts/hydroxide-auth.sh`; the service can
-remain stopped while doing so.
+ProtonMail password), just rerun `./hydroxide-auth.sh` or execute
+`hydroxide-auth-cli` inside a container shell; the service can remain running the
+whole time.
 
 ## How does it work?
 

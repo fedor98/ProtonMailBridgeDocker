@@ -55,9 +55,9 @@ RUN apk --update upgrade \
 COPY --from=builder /go/bin/hydroxide /usr/bin/hydroxide
 
 COPY ./docker_shell_scripts/start.sh start.sh
-
 COPY ./docker_shell_scripts/expect.sh expect.sh 
-RUN chmod +x ./expect.sh 
+COPY ./docker_shell_scripts/hydroxide-auth-cli.sh /usr/local/bin/hydroxide-auth-cli
+RUN chmod +x ./expect.sh /usr/local/bin/hydroxide-auth-cli
 RUN apk add expect 
 
 WORKDIR /

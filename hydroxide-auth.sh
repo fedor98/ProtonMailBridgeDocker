@@ -10,16 +10,11 @@ if ! command -v ${COMPOSE_BIN%% *} >/dev/null 2>&1; then
   exit 1
 fi
 
-read -rp "ProtonMail username: " PROTONMAIL_USER
-read -srp "ProtonMail password: " PROTONMAIL_PASS
-printf "\n"
-read -rp "ProtonMail 2FA TOTP code: " PROTONMAIL_2FA
+if ! ${COMPOSE_BIN} ps --services --filter status=running | grep -qx "$SERVICE_NAME"; then
+  printf "%s\n" "Service '$SERVICE_NAME' is not running. Start it first with 'docker compose up -d %s'." "$SERVICE_NAME"
+  exit 1
+fi
 
-printf "%s\n" "Running hydroxide authentication inside the container..."
+printf "%s\n" "Running interactive auth inside the existing container..."
 
-${COMPOSE_BIN} run --rm \
-  -e HYDROXIDE_AUTH_ONLY=1 \
-  -e PROTONMAIL_USER="$PROTONMAIL_USER" \
-  -e PROTONMAIL_PASS="$PROTONMAIL_PASS" \
-  -e PROTONMAIL_2FA="$PROTONMAIL_2FA" \
-  "$SERVICE_NAME"
+${COMPOSE_BIN} exec -it "$SERVICE_NAME" /usr/local/bin/hydroxide-auth-cli
