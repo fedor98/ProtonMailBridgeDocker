@@ -12,7 +12,7 @@
 ################################################%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 # builder OS
-FROM golang:1-alpine as builder
+FROM golang:1-alpine AS builder
 
 # update / dependencies  
 RUN apk --update upgrade \
@@ -20,7 +20,7 @@ RUN apk --update upgrade \
 && rm -rf /var/cache/apk/*
 
 # docker container settings
-ENV GOPATH /go
+ENV GOPATH=/go
 
 # copy source code into builder
 WORKDIR /src
