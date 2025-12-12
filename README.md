@@ -13,6 +13,25 @@ Rationale:
 
 Feel free to join the IRC channel: #emersion on Libera Chat.
 
+## Docker workflow
+
+This repository includes a Docker setup (see `Dockerfile`, `docker-compose.yml`
+and `docker_shell_scripts/`) that keeps ProtonMail credentials out of the
+Compose file. The flow is:
+
+1. Build the image: `docker compose build`.
+2. Run `./scripts/hydroxide-auth.sh` and enter your username, ProtonMail
+   password and current 2FA code when prompted. The script launches the container
+   in an auth-only mode (`HYDROXIDE_AUTH_ONLY=1`), runs `hydroxide auth` inside
+   it and stores the resulting bridge hash in the mounted data volume.
+3. Start the always-on bridge: `docker compose up -d hydroxide`.
+
+The hashed bridge credentials are persisted inside the host directories mounted
+to `/data` and `/root/.config/hydroxide`, so container restarts do not require
+re-entering anything. If you need to re-authenticate (e.g. you changed your
+ProtonMail password), just rerun `./scripts/hydroxide-auth.sh`; the service can
+remain stopped while doing so.
+
 ## How does it work?
 
 hydroxide is a server that translates standard protocols (SMTP, IMAP, CardDAV)

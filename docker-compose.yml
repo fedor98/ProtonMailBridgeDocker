@@ -1,0 +1,16 @@
+services:
+  hydroxide:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: proton-mail
+    ports:
+      - "1025:1025"
+      - "1143:1143"
+    volumes:
+      # - hydroxide-volume:/data
+      - ./data-hydroxide:/data
+      - ./auth-hydroxide:/root/.config/hydroxide
+    restart: always
+# volumes:
+#   hydroxide-volume:
