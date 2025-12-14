@@ -44,7 +44,7 @@ EXPOSE 1143
 
 # update / dependencies
 RUN apk --update upgrade \
-    && apk --no-cache add ca-certificates bash openrc jq \
+    && apk --no-cache add ca-certificates bash openrc \
     && rm -rf /var/cache/apk/*
 
 # email variables; either pass these from your docker-compose file OR uncomment and insert below
@@ -54,11 +54,8 @@ RUN apk --update upgrade \
 # copy hydroxide
 COPY --from=builder /go/bin/hydroxide /usr/bin/hydroxide
 
-COPY ./docker_shell_scripts/start.sh start.sh
-COPY ./docker_shell_scripts/expect.sh expect.sh 
-COPY ./docker_shell_scripts/hydroxide-auth-cli.sh /usr/local/bin/hydroxide-auth-cli
-RUN chmod +x ./expect.sh /usr/local/bin/hydroxide-auth-cli
-RUN apk add expect 
+COPY ./docker_shell_scripts/start.sh /start.sh
+RUN chmod +x /start.sh
 
 WORKDIR /
 
