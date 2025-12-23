@@ -26,6 +26,9 @@ ENV GOPATH=/go
 WORKDIR /src
 COPY . .
 
+# Patch for iOS/macOS to work with Hydroxide
+RUN sed -ie '310,313d' /opt/hydroxide/imap/mailbox.go
+
 # build hydroxide
 RUN go build ./cmd/hydroxide && go install ./cmd/hydroxide
 
