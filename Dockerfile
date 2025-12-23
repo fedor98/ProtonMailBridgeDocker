@@ -27,7 +27,12 @@ WORKDIR /src
 COPY . .
 
 # Patch for iOS/macOS to work with Hydroxide
-RUN sed -ie '310,313d' imap/mailbox.go
+#   remove the following logic: if wantValue == "" && len(values) == 0
+RUN sed -i '
+    /if wantValue == "" && len(values) == 0 {/ {
+        n; d
+    }
+' imap/mailbox.go
 
 # build hydroxide
 RUN go build ./cmd/hydroxide && go install ./cmd/hydroxide
