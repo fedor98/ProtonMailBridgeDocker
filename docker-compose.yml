@@ -4,6 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: proton-mail
+    environment:
+      # Set to "true" (or 1/yes/on/debug) to enable Hydroxide debug logs via start.sh
+      HYDROXIDE_DEBUG: "${HYDROXIDE_DEBUG:-false}"
     ports:
       - "1025:1025"
       - "1145:1143"

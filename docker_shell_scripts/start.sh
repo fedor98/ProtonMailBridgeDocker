@@ -7,6 +7,19 @@ printf "%s\n" "Starting Hydroxide..."
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 AUTH_JSON_PATH="$CONFIG_HOME/hydroxide/auth.json"
 
+LOWERCASE_DEBUG_FLAG=""
+if [ -n "${HYDROXIDE_DEBUG:-}" ]; then
+  LOWERCASE_DEBUG_FLAG="$(printf '%s' "$HYDROXIDE_DEBUG" | tr '[:upper:]' '[:lower:]')"
+fi
+
+ENABLE_DEBUG=false
+case "$LOWERCASE_DEBUG_FLAG" in
+  1|true|yes|on|debug)
+    ENABLE_DEBUG=true
+    printf "%s\n" "Hydroxide debug logging enabled (HYDROXIDE_DEBUG=$HYDROXIDE_DEBUG)."
+    ;;
+esac
+
 wait_for_auth() {
   if [ -s "$AUTH_JSON_PATH" ]; then
     return 0
@@ -29,6 +42,11 @@ else
 fi
 
 # MUST host on '0.0.0.0' for the ports to pass through to other containers
-hydroxide -imap-host '0.0.0.0' imap &
-hydroxide -smtp-host '0.0.0.0' smtp &
+common_flags=()
+if [ "$ENABLE_DEBUG" = true ]; then
+  common_flags+=("-debug")
+fi
+
+hydroxide "${common_flags[@]}" -imap-host '0.0.0.0' imap &
+hydroxide "${common_flags[@]}" -smtp-host '0.0.0.0' smtp &
 tail -f /dev/null
